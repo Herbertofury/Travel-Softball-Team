@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101217">
+  <meta name="description" content="Travel softball team website">
+  <meta name="color-scheme" content="light">
+  <title>Travel Softball</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header" data-header>
+    <div class="header-shell">
+      <a class="brand-lockup" href="#top" aria-label="Back to top">
+        <span class="brand-mark" data-team-mark>TS</span>
+        <span class="brand-copy">
+          <strong data-team-name>TEAM NAME</strong>
+          <small data-team-subtitle>TRAVEL SOFTBALL</small>
+        </span>
+      </a>
+
+      <nav class="desktop-nav" aria-label="Primary navigation">
+        <a href="#story">Story</a>
+        <a href="#roster">Roster</a>
+        <a href="#schedule">Schedule</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#sponsors">Sponsors</a>
+      </nav>
+
+      <a class="header-cta" data-contact-link href="#contact">Contact</a>
+
+      <button class="menu-button" type="button" data-menu-button aria-expanded="false" aria-controls="mobile-menu">
+        <span></span><span></span>
+        <span class="sr-only">Toggle menu</span>
+      </button>
+    </div>
+
+    <nav class="mobile-menu" id="mobile-menu" data-mobile-menu aria-label="Mobile navigation">
+      <a href="#story">Story</a>
+      <a href="#roster">Roster</a>
+      <a href="#schedule">Schedule</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#sponsors">Sponsors</a>
+      <a data-contact-link href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="hero-grid hero-grid-left" aria-hidden="true"></div>
+      <div class="hero-grid hero-grid-right" aria-hidden="true"></div>
+      <div class="hero-ball hero-ball-one" aria-hidden="true"></div>
+      <div class="hero-ball hero-ball-two" aria-hidden="true"></div>
+
+      <div class="hero-shell">
+        <div class="hero-copy reveal">
+          <p class="eyebrow" data-hero-eyebrow>TRAVEL SOFTBALL</p>
+          <h1 data-hero-title>BUILT FOR THE MILES.<br><em>READY FOR THE MOMENT.</em></h1>
+          <p class="hero-intro" data-hero-intro>
+            A high-performance travel softball program built around preparation, confidence, and competing the right way.
+          </p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#roster">Meet the roster</a>
+            <a class="button button-ghost" href="#schedule">View schedule</a>
+          </div>
+        </div>
+
+        <div class="hero-panel reveal" data-delay="1">
+          <div class="hero-photo" data-hero-photo>
+            <div class="photo-placeholder">
+              <span>DROP HERO PHOTO HERE</span>
+              <small>assets/images/hero.webp</small>
+            </div>
+          </div>
+          <div class="hero-panel-footer">
+            <div>
+              <span class="micro-label">HOME BASE</span>
+              <strong data-home-base>YOUR CITY, ST</strong>
+            </div>
+            <div>
+              <span class="micro-label">SEASON</span>
+              <strong data-season>YOUR SEASON</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-ticker" aria-hidden="true">
+        <div class="ticker-track" data-ticker-track>
+          <span>WORK</span><i></i><span>TRAVEL</span><i></i><span>COMPETE</span><i></i><span>GROW</span><i></i>
+          <span>WORK</span><i></i><span>TRAVEL</span><i></i><span>COMPETE</span><i></i><span>GROW</span><i></i>
+        </div>
+      </div>
+    </section>
+
+    <section class="story section-pad" id="story">
+      <div class="section-shell story-grid">
+        <div class="section-kicker reveal">
+          <span>01</span>
+          <p>WHO WE ARE</p>
+        </div>
+        <div class="story-copy reveal" data-delay="1">
+          <h2 data-story-title>MORE THAN A WEEKEND TEAM.</h2>
+          <p class="story-lede" data-story-lede>
+            We develop complete athletes - sharp fundamentals, resilient mindsets, and teammates who know how to show up for each other.
+          </p>
+          <p data-story-body>
+            This starter copy is intentionally easy to replace. Tell your story in a few direct sentences: what the program values, who it serves, and what makes the team different.
+          </p>
+        </div>
+        <div class="story-stats reveal" data-delay="2" data-stats></div>
+      </div>
+    </section>
+
+    <section class="roster section-pad section-dark" id="roster">
+      <div class="section-shell">
+        <div class="section-heading reveal">
+          <div>
+            <span class="section-number">02</span>
+            <p class="eyebrow">THE ROSTER</p>
+          </div>
+          <h2>THE NAMES<br><em>BEHIND THE NUMBERS.</em></h2>
+        </div>
+
+        <div class="roster-tools reveal" data-delay="1">
+          <div class="filter-group" data-position-filters aria-label="Filter roster by position"></div>
+          <p class="roster-count" data-roster-count></p>
+        </div>
+
+        <div class="roster-grid" data-roster-grid></div>
+      </div>
+    </section>
+
+    <section class="schedule section-pad" id="schedule">
+      <div class="section-shell">
+        <div class="section-heading section-heading-light reveal">
+          <div>
+            <span class="section-number">03</span>
+            <p class="eyebrow">ON THE ROAD</p>
+          </div>
+          <h2>WHERE WE<br><em>SHOW UP NEXT.</em></h2>
+        </div>
+
+        <div class="schedule-list" data-schedule-list></div>
+      </div>
+    </section>
+
+    <section class="gallery section-pad" id="gallery">
+      <div class="section-shell">
+        <div class="gallery-heading reveal">
+          <div>
+            <span class="section-number">04</span>
+            <p class="eyebrow">BETWEEN THE LINES</p>
+          </div>
+          <p data-gallery-copy>Replace these slots with real game-day, dugout, practice, and travel moments. The layout automatically adapts to however many photos you add.</p>
+        </div>
+
+        <div class="gallery-grid" data-gallery-grid></div>
+      </div>
+    </section>
+
+    <section class="sponsors section-pad section-warm" id="sponsors">
+      <div class="section-shell sponsors-grid">
+        <div class="sponsor-copy reveal">
+          <span class="section-number">05</span>
+          <p class="eyebrow">BACKING THE JOURNEY</p>
+          <h2>PROUDLY<br><em>SUPPORTED BY.</em></h2>
+          <p>Travel ball takes a village. This section gives sponsors real visibility without making the site feel like an ad wall.</p>
+          <a class="text-link" data-sponsor-contact href="#contact">Become a sponsor <span aria-hidden="true">-></span></a>
+        </div>
+        <div class="sponsor-grid" data-sponsor-grid></div>
+      </div>
+    </section>
+
+    <section class="contact section-pad section-ink" id="contact">
+      <div class="contact-line" aria-hidden="true"></div>
+      <div class="section-shell contact-grid">
+        <div class="reveal">
+          <p class="eyebrow">LET'S TALK SOFTBALL</p>
+          <h2 data-contact-title>COACHES. FAMILIES. SPONSORS.<br><em>WE'D LOVE TO HEAR FROM YOU.</em></h2>
+        </div>
+        <div class="contact-card reveal" data-delay="1">
+          <p data-contact-copy>Questions about the team, schedule, recruiting, or sponsorships? Reach out directly.</p>
+          <div class="contact-actions" data-contact-actions></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="section-shell footer-grid">
+      <div class="footer-brand">
+        <span class="brand-mark" data-team-mark>TS</span>
+        <div>
+          <strong data-team-name>TEAM NAME</strong>
+          <small data-team-subtitle>TRAVEL SOFTBALL</small>
+        </div>
+      </div>
+      <p data-footer-copy>Built for the team. Easy to update. Ready to travel.</p>
+      <p class="footer-meta">&copy; <span data-year></span> <span data-team-name>TEAM NAME</span></p>
+    </div>
+  </footer>
+
+  <script src="site.config.js"></script>
+  <script src="app.js" defer></script>
+</body>
+</html>
