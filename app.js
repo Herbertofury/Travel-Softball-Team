@@ -42,10 +42,18 @@
   }
   filters.addEventListener('click',e=>{const b=e.target.closest('[data-filter]');if(!b)return;filter=b.dataset.filter;$$('[data-filter]',filters).forEach(x=>{const on=x===b;x.classList.toggle('is-active',on);x.setAttribute('aria-pressed',String(on));});renderRoster();});
   renderRoster();
-  const events=data.schedule||[];
-  const upcoming=events.find(e=>e.endDate && e.endDate>=new Date().toLocaleDateString('en-CA',{timeZone:'America/Denver'}));
-  if(upcoming){text('[data-next-event]',upcoming.name);text('[data-next-date]',upcoming.date);} else {$('[data-next-event]').closest('a').classList.add('is-hidden');}
-  $('[data-schedule-list]').innerHTML=events.length ? events.map(e=>`<article class="schedule-row"><div class="date-tile"><span>${esc(e.month||e.date.split(' ')[0])}</span><strong>${esc(e.day||'—')}</strong></div><div class="schedule-name"><h3>${esc(e.name)}</h3><p>${esc(e.date)} · ${esc(e.type)}</p></div><p class="schedule-location">${esc(e.location)}</p><div class="schedule-action">${external(e.mapUrl)?`<a class="schedule-link" href="${esc(external(e.mapUrl))}" target="_blank" rel="noopener noreferrer">Field directions</a>`:`<span class="schedule-status">${esc(e.status||'ON THE CALENDAR')}</span>`}</div></article>`).join('') : '<p class="empty-state">The next season\'s schedule is coming soon.</p>';
+  let events=data.schedule||[];
+  const scheduleDate=s=>new Date(s+'T12:00:00Z').toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'}).toUpperCase();
+  function renderSchedule(){
+    const today=new Date().toLocaleDateString('en-CA',{timeZone:'America/Denver'});
+    const upcoming=events.find(e=>!e.cancelled&&e.endDate && e.endDate>=today);
+    const next=$('[data-next-event]').closest('a');next.classList.toggle('is-hidden',!upcoming);
+    if(upcoming){text('[data-next-event]',upcoming.name);text('[data-next-date]',upcoming.date||scheduleDate(upcoming.startDate));next.href='/calendar?event='+encodeURIComponent(upcoming.id);}
+    const list=events.filter(e=>!e.cancelled && e.endDate>=today).slice(0,4);
+    $('[data-schedule-list]').innerHTML=list.length ? list.map(e=>`<article class="schedule-row"><div class="date-tile"><span>${esc(e.month||scheduleDate(e.startDate).split(' ')[0])}</span><strong>${esc(e.day||e.startDate.slice(-2))}</strong></div><div class="schedule-name"><h3>${esc(e.name)}</h3><p>${esc(e.date||(scheduleDate(e.startDate)+(e.endDate!==e.startDate?' – '+scheduleDate(e.endDate):'')))} · ${esc(e.type)}</p></div><p class="schedule-location">${esc(e.location)}</p><div class="schedule-action"><a class="schedule-link" href="/calendar?event=${encodeURIComponent(e.id)}">Details & RSVP ↗</a></div></article>`).join('') : '<p class="empty-state">The next season\'s schedule is coming soon.</p>';
+  }
+  renderSchedule();
+  if(location.protocol!=='file:')fetch('/api/events').then(r=>{if(!r.ok)throw new Error();return r.json();}).then(result=>{events=result.events;renderSchedule();}).catch(()=>{const note=$('[data-schedule-load-note]');note.hidden=false;note.textContent='The live schedule could not be loaded. Open the full calendar to try again.';});
   function icsEscape(v=''){return String(v).replace(/\\/g,'\\\\').replace(/\r?\n/g,'\\n').replace(/,/g,'\\,').replace(/;/g,'\\;');}
   const validDate=s=>/^\d{4}-\d{2}-\d{2}$/.test(s||'') && !Number.isNaN(Date.parse(s));
   const dateStamp=s=>s.replace(/-/g,'');
@@ -53,6 +61,7 @@
   const calendar=$('[data-calendar]');
   if(!calendarEvents.length)calendar.hidden=true;
   calendar.addEventListener('click',()=>{
+    if(location.protocol!=='file:'){location.href='/calendar.ics';return;}
     const stamp=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z/,'Z');
     const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Travel Softball//Team Schedule//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH',`X-WR-CALNAME:${icsEscape(data.brand.teamName)} schedule`];
     calendarEvents.forEach((e,i)=>{const end=new Date(e.endDate+'T00:00:00Z');end.setUTCDate(end.getUTCDate()+1);lines.push('BEGIN:VEVENT',`UID:${dateStamp(e.startDate)}-${i}-${data.brand.mark.replace(/[^a-z0-9]/gi,'')}@travel-softball`,`DTSTAMP:${stamp}`,`DTSTART;VALUE=DATE:${dateStamp(e.startDate)}`,`DTEND;VALUE=DATE:${dateStamp(end.toISOString().slice(0,10))}`,`SUMMARY:${icsEscape(e.name)}`,`LOCATION:${icsEscape(e.location)}`,`DESCRIPTION:${icsEscape(data.preview?'Illustrative concept schedule. Replace with confirmed team events.':e.type)}`,'END:VEVENT');});

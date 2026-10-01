@@ -29,10 +29,11 @@ window.SOFTBALL_SITE = {
     { number: "28", name: "Casey L.", positions: ["1B", "UTIL"], gradYear: "", batsThrows: "R/R", image: "", profileUrl: "" }
   ],
   schedule: [
-    { date: "OCT 10–11", month: "OCT", day: "10", name: "Fall Classic", location: "Colorado Springs, CO", type: "Tournament", status: "UP NEXT", mapUrl: "", startDate: "2026-10-10", endDate: "2026-10-11" },
-    { date: "OCT 24–25", month: "OCT", day: "24", name: "October Showcase", location: "Aurora, CO", type: "Showcase", status: "ON THE CALENDAR", mapUrl: "", startDate: "2026-10-24", endDate: "2026-10-25" },
-    { date: "NOV 07–08", month: "NOV", day: "07", name: "Last Inning Invitational", location: "Fort Collins, CO", type: "Tournament", status: "ON THE CALENDAR", mapUrl: "", startDate: "2026-11-07", endDate: "2026-11-08" }
+    { id: "fall-classic-2026", date: "OCT 10–11", month: "OCT", day: "10", name: "Fall Classic", location: "Colorado Springs, CO", type: "Tournament", status: "UP NEXT", mapUrl: "", startDate: "2026-10-10", endDate: "2026-10-11", allDay: true, description: "A weekend on the diamond. Field assignments and game times will be posted when confirmed.", rsvpDeadline: "2026-10-08", preview: true },
+    { id: "october-showcase-2026", date: "OCT 24–25", month: "OCT", day: "24", name: "October Showcase", location: "Aurora, CO", type: "Showcase", status: "ON THE CALENDAR", mapUrl: "", startDate: "2026-10-24", endDate: "2026-10-25", allDay: true, description: "Two days of softball. Check back for the confirmed field and game schedule.", rsvpDeadline: "2026-10-22", preview: true },
+    { id: "last-inning-2026", date: "NOV 07–08", month: "NOV", day: "07", name: "Last Inning Invitational", location: "Fort Collins, CO", type: "Tournament", status: "ON THE CALENDAR", mapUrl: "", startDate: "2026-11-07", endDate: "2026-11-08", allDay: true, description: "One more weekend together. Game times and field details to follow.", rsvpDeadline: "2026-11-05", preview: true }
   ],
+  calendar: { timezone: "America/Denver", types: ["Tournament", "Showcase", "Practice", "Game", "Team event"] },
   gallery: {
     title: "THIS IS<br>OUR KIND OF WEEKEND.", copy: "A little dirt. A lot of heart. The moments that make the miles worth it.",
     photos: [

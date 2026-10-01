@@ -22,7 +22,9 @@ Headline fields support only `<br>` and `<em>`. Other text is safely escaped. Li
 
 ## Calendar
 
-An event needs `startDate` and `endDate` in `YYYY-MM-DD` format for the schedule download. `endDate` is the last included day; the exporter correctly writes the next day as the exclusive iCalendar end. The downloaded `.ics` imports into Google Calendar, Outlook, or Apple Calendar. Sample events are marked illustrative inside their calendar descriptions.
+`/calendar` is the full month/agenda calendar; `/rsvp` collects attendance. An event needs a stable `id`, `startDate`, and `endDate` in `YYYY-MM-DD` format. `endDate` is the last included day; all-day exports correctly write the next day as the exclusive iCalendar end. Timed events use `startTime`/`endTime` in `HH:MM` and the configured `America/Denver` timezone. Optional fields include arrival time, RSVP deadline, and details. Sample events are marked illustrative inside the UI and calendar descriptions.
+
+The config supplies the initial sample schedule. Signed-in owners can create/edit/cancel events through the calendar; these durable D1 records override config events by ID. The homepage, full calendar, and exports read the same merged schedule. See [CALENDAR.md](CALENDAR.md) for permissions and storage behavior.
 
 ## Contact
 
@@ -30,6 +32,6 @@ No email or phone has been invented. Add the team's real approved contact detail
 
 ## Publishing anywhere
 
-Open `index.html` directly to review. Upload the root page, scripts, stylesheet, and `assets/` folder to any static host. No packages, subscriptions, or build tools are needed. After edits, run `python scripts/package-static.py` to refresh the `dist/` adapter for Sites. Keep the source repo and the Sites deployment together; do not edit only `dist/`.
+Open `index.html` directly to review the presentation site. The full calendar and RSVP app requires its Worker/D1 backend: run `npm ci`, then `npm run build`. Publish the generated adapter using the existing Sites identity. Schema changes require `npm run db:generate`; inspect and retain the generated SQL and metadata before publishing. Keep the source repo and the Sites deployment together; do not edit only `dist/`.
 
 For Wix, Webflow, or Squarespace, carry the same content model and design into that host as an adapter. Keep this repository authoritative.

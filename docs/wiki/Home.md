@@ -10,4 +10,4 @@ An editorial travel-softball website with a navy and electric-yellow identity, l
 
 The current Aftershock identity and player/event data are an illustrative concept. Replace them with the team's confirmed details and approved photographs before treating the site as official.
 
-Roster filters, a downloadable calendar, mobile navigation, and a keyboard-accessible photo viewer are included. There are no trackers, remote font calls, or fake contact forms.
+Roster filters, a full month/agenda calendar, durable RSVP attendance, owner schedule management, mobile navigation, and a keyboard-accessible photo viewer are included. There are no trackers, remote font calls, or fake contact forms.

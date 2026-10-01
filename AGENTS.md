@@ -6,11 +6,12 @@ This site should feel like a deliberate sports editorial identity, not a generic
 
 ## Source of truth
 
-- `site.config.js` owns team-specific content, links, colors, roster, schedule, gallery, sponsors, and contact information.
+- `site.config.js` owns team-specific content, links, colors, roster, initial schedule, gallery, sponsors, and contact information. Owner-created event overrides and RSVPs live in D1; all pages read them through the same API.
 - Do not hardcode duplicate team facts into layout files unless the value is a fallback.
 - `index.html` owns semantic page structure.
 - `styles.css` owns the visual system.
 - `app.js` owns rendering and interactions.
+- `calendar.html`, `rsvp.html`, `calendar.css`, and `calendar.js` own the scheduling UI. `worker/api.js` owns persistence, authentication, and server authorization. Generated Drizzle migrations own schema changes.
 
 ## Portability
 
