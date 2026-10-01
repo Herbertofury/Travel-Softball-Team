@@ -1,0 +1,38 @@
+[
+  {
+    "role": "hero",
+    "width": 4000,
+    "height": 2667,
+    "source_url": "https://commons.wikimedia.org/wiki/File:2023_LLSWS_%E2%80%94_Day_3_(53105050147).jpg",
+    "image_url": "https://upload.wikimedia.org/wikipedia/commons/e/e2/2023_LLSWS_%E2%80%94_Day_3_%2853105050147%29.jpg",
+    "license": "Public domain, released by City of Greenville, North Carolina on Flickr under Public Domain Mark; verified by Wikimedia Commons Flickr review.",
+    "license_url": "https://creativecommons.org/publicdomain/mark/1.0/",
+    "credit": "Photo: Aaron Hines / City of Greenville, North Carolina, via Wikimedia Commons",
+    "description": "Female pitcher in electric-yellow and navy uniform pitches a yellow softball under stadium lights at the 2023 Little League Softball World Series. Wide frame, subject slightly left of center, dark blurred spectator background.",
+    "composition_note": "Hero can preserve action with object-position roughly 44% 45%; a navy overlay supplies text contrast. Yellow jersey matches requested palette."
+  },
+  {
+    "role": "portrait_action",
+    "width": 2728,
+    "height": 4100,
+    "source_url": "https://www.pexels.com/photo/a-woman-playing-softball-11822931/",
+    "image_url": "https://images.pexels.com/photos/11822931/pexels-photo-11822931.jpeg?cs=srgb&fm=jpg",
+    "license": "Pexels License: free use, modification allowed, attribution optional. Do not imply endorsement by depicted people/brands.",
+    "license_url": "https://www.pexels.com/license/",
+    "credit": "Photo by Bryce Carithers on Pexels",
+    "description": "Female softball batter in white and sky-blue uniform photographed full length at the end of a powerful swing, yellow softball visible above bat.",
+    "composition_note": "Strong vertical full-bleed image for player development section. Ball and bat are near upper right; avoid overly tight top crop."
+  },
+  {
+    "role": "team",
+    "width": 1826,
+    "height": 2745,
+    "source_url": "https://www.pexels.com/photo/people-playing-softball-11822927/",
+    "image_url": "https://images.pexels.com/photos/11822927/pexels-photo-11822927.jpeg?cs=srgb&fm=jpg",
+    "license": "Pexels License: free use, modification allowed, attribution optional. Do not imply endorsement by depicted people/brands.",
+    "license_url": "https://www.pexels.com/license/",
+    "credit": "Photo by Bryce Carithers on Pexels",
+    "description": "Four female softball players in matching white and sky-blue uniforms discuss strategy in the infield, wearing fielding masks and holding a yellow softball.",
+    "composition_note": "Use vertical panel or 4:3 crop around shoulders and gloves; suitable for culture/teamwork section."
+  }
+]
