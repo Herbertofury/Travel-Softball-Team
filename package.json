@@ -5,7 +5,7 @@
   "scripts": {
     "build": "npm --prefix mobile run build && node scripts/build-worker.mjs",
     "db:generate": "drizzle-kit generate",
-    "test": "node tests/calendar-api.mjs"
+    "test": "node tests/calendar-api.mjs && node tests/mobile-time.mjs"
   },
   "devDependencies": {
     "drizzle-kit": "0.31.11",

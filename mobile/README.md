@@ -6,7 +6,7 @@ Included: app navigation, month/agenda calendar, event details/directions, RSVP 
 
 ## Build
 
-Install Node 22+, Java 21, and Android Studio with SDK 36. For iOS use a Mac with Xcode 26+.
+Install Node 24 LTS (22+ is supported), Java 21, and Android Studio with SDK 36. For iOS use a Mac with Xcode 26+.
 
 ```sh
 cd mobile
@@ -30,3 +30,9 @@ Public schedules can be viewed offline, with a visible snapshot time. Private no
 ## Store handoff
 
 See `store/RELEASE.md` for developer-account/signing steps, official tool links, privacy fields, and review requirements. The supplied projects and test builds are not claimed to be published in either store. No Apple signing or iOS device execution can be completed on the Linux build host.
+
+## Implementation choices
+
+Capacitor 8.5.2 supplies genuine Android/iOS projects and device APIs while keeping one compact, bundled interface for the public home-screen app. The existing Worker/D1 API and Drizzle migrations remain the durable source of schedule/attendance data. Small native ES modules and esbuild preserve the existing site’s lightweight architecture and local assets; there is no second schedule database or duplicated team content. A separate React Native/Expo client was considered, but would add another rendering stack and content synchronization surface without improving the required calendar/RSVP workflows. Native sharing, reminders, haptics, safe areas, and encrypted storage are implemented through maintained platform plugins.
+
+Android CI uses the hosted runner’s existing SDK rather than the legacy setup action that still requests the removed `tools` package. Builds explicitly require SDK 36 and verify `android.jar` before compiling. Applied migrations and phone/session identity are unchanged by toolchain repairs.
