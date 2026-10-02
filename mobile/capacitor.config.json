@@ -1,0 +1,9 @@
+{
+  "appId": "com.travelsoftball.team",
+  "appName": "Aftershock",
+  "webDir": "www",
+  "backgroundColor": "#081c35",
+  "ios": { "contentInset": "never", "backgroundColor": "#081c35", "preferredContentMode": "mobile" },
+  "android": { "backgroundColor": "#081c35", "allowMixedContent": false },
+  "plugins": { "SplashScreen": { "launchAutoHide": true, "backgroundColor": "#081c35", "showSpinner": false }, "LocalNotifications": { "smallIcon": "ic_stat_team", "iconColor": "#081c35" } }
+}

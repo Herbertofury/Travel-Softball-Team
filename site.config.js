@@ -44,6 +44,7 @@ window.SOFTBALL_SITE = {
   },
   sponsors: [],
   sponsorship: { title: "BIG DREAMS.<br>LOCAL SUPPORT.", copy: "Help with tournament fees, equipment, and the next long drive. Your support keeps our team on the field.", cta: "Let's talk sponsorship" },
-  contact: { title: "LET'S TALK<br><em>SOFTBALL.</em>", copy: "Roster questions, a spot on the schedule, or a business that wants to back the team. We'd love to hear from you.", email: "", phone: "", instagram: "", facebook: "", empty: "Team contact details will be announced here." },
+  contact: { name: "Trent", role: "Team owner & contact", title: "LET'S TALK<br><em>SOFTBALL.</em>", copy: "Questions about the team, the schedule, or supporting the next season? Contact Trent.", email: "trent@kerrpanel.com", phone: "720-292-6603", instagram: "", facebook: "", empty: "Team contact details will be announced here." },
+  app: { name: "Aftershock", id: "com.travelsoftball.team", siteUrl: "https://travel-softball-team.becky-herbie-6815.chatgpt.site", version: "1.0.0", build: 1 },
   footer: { copy: "ALL HEART. ALL HUSTLE. ALL IN." }
 };

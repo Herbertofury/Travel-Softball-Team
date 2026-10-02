@@ -11,11 +11,12 @@ This site should feel like a deliberate sports editorial identity, not a generic
 - `index.html` owns semantic page structure.
 - `styles.css` owns the visual system.
 - `app.js` owns rendering and interactions.
+- `mobile/src/` owns the shared phone interface; `mobile/android/` and `mobile/ios/` are genuine native projects. Rebuild and sync after shared UI edits. Keep the shared API, contact, and schedule canonical; never embed private credentials.
 - `calendar.html`, `rsvp.html`, `calendar.css`, and `calendar.js` own the scheduling UI. `worker/api.js` owns persistence, authentication, and server authorization. Generated Drizzle migrations own schema changes.
 
 ## Portability
 
-Keep the canonical site framework-free and zero-build unless a future requirement clearly needs a framework. Any platform-specific version should be treated as an adapter of this canonical source, not a new independent truth.
+Keep the homepage framework-free unless a future requirement clearly needs a framework. Any platform-specific version should be treated as an adapter of this canonical source, not a new independent truth.
 
 ## UI rules
 

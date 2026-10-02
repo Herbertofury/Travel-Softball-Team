@@ -2,9 +2,18 @@
 const json = (value, status=200) => new Response(JSON.stringify(value), {status, headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}});
 const fail = (status,message) => {throw Object.assign(new Error(message),{status});};
 const database = env => env.DB || fail(503,'The team calendar is temporarily unavailable. Please try again.');
-const identity = (request,env) => {
-  const id=request.headers.get('oai-authenticated-user-id');
-  const email=request.headers.get('oai-authenticated-user-email');
+const nativeOrigins = new Set(['capacitor://localhost','https://localhost']);
+const hashToken = async value => btoa(String.fromCharCode(...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value))))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const identity = async (request,env) => {
+  let id=request.headers.get('oai-authenticated-user-id');
+  let email=request.headers.get('oai-authenticated-user-email');
+  const authorization=request.headers.get('Authorization');
+  if(authorization){
+    if(!/^Bearer [A-Za-z0-9_-]{43}$/.test(authorization))fail(401,'Please sign in again.');
+    const record=await database(env).prepare('SELECT user_id,email FROM app_sessions WHERE token_hash=? AND expires_at>?').bind(await hashToken(authorization.slice(7)),Date.now()).first();
+    if(!record)fail(401,'Your app session has expired. Please sign in again.');
+    id=record.user_id;email=record.email;
+  }
   const admins=(env.ADMIN_EMAILS||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
   return {id,canManage:!!id && !!email && admins.includes(email.toLowerCase())};
 };
@@ -14,10 +23,10 @@ const clean = (v,max,required=false) => {
   if(typeof v!=='string' || v.length>max || (required && !v.trim()))fail(400,'Please check the required fields and text lengths.');
   return v.trim();
 };
-async function body(request) {
+async function body(request,allowNativePublic=false) {
   if(!request.headers.get('content-type')?.includes('application/json'))fail(415,'Please submit the form as JSON.');
   const origin=request.headers.get('origin');
-  if(!origin || origin!==new URL(request.url).origin)fail(403,'Please submit this form from the team website.');
+  if(!origin || (origin!==new URL(request.url).origin && !(nativeOrigins.has(origin) && (request.headers.has('Authorization')||allowNativePublic))))fail(403,'Please submit this form from the team website or app.');
   if(Number(request.headers.get('content-length'))>12000)fail(413,'The form is too large.');
   const raw=await request.text();if(raw.length>12000)fail(413,'The form is too large.');
   try{const value=JSON.parse(raw);if(!value || Array.isArray(value) || typeof value!=='object')throw new Error();return value;}catch{fail(400,'The form could not be read. Please check your entries.');}
@@ -56,7 +65,53 @@ function calendarFile(events) {
   return new Response(lines.map(fold).join('\r\n')+'\r\n',{headers:{'Content-Type':'text/calendar; charset=utf-8','Content-Disposition':'attachment; filename="aftershock-calendar.ics"','Cache-Control':'no-cache'}});
 }
 async function api(request,env,url) {
-  const who=identity(request,env),db=database(env),path=url.pathname;
+  const who=await identity(request,env),db=database(env),path=url.pathname;
+  if(path==='/api/app-auth/start' && request.method==='POST'){
+    const input=await body(request,true);
+    if(!/^[A-Za-z0-9_-]{43}$/.test(input.challenge||'')||!['ios','android'].includes(input.platform))fail(400,'The app sign-in request is invalid.');
+    const requestId=crypto.randomUUID(),expiresAt=Date.now()+5*60*1000;
+    await db.batch([db.prepare('DELETE FROM app_connections WHERE expires_at<?').bind(Date.now()),db.prepare('DELETE FROM app_sessions WHERE expires_at<?').bind(Date.now()),db.prepare('INSERT INTO app_connections (request_id,challenge,platform,expires_at) VALUES (?,?,?,?)').bind(requestId,input.challenge,input.platform,expiresAt)]);
+    return json({requestId,expiresAt,approvalUrl:new URL('/connect-app?request='+requestId,url.origin).href},201);
+  }
+  if(path==='/api/app-auth/connection' && request.method==='GET'){
+    const row=await db.prepare('SELECT platform,expires_at,user_id FROM app_connections WHERE request_id=? AND expires_at>?').bind(url.searchParams.get('request')||'',Date.now()).first();
+    if(!row)fail(410,'This app connection expired. Start sign-in again in the app.');
+    return json({platform:row.platform,approved:!!row.user_id,signedIn:!!who.id});
+  }
+  if(path==='/api/app-auth/approve' && request.method==='POST'){
+    if(!who.id || request.headers.has('Authorization'))fail(401,'Sign in on the team website to connect this phone.');
+    const input=await body(request);
+    const row=await db.prepare('UPDATE app_connections SET user_id=?,email=? WHERE request_id=? AND expires_at>? AND user_id IS NULL RETURNING request_id').bind(who.id,request.headers.get('oai-authenticated-user-email'),input.requestId||'',Date.now()).first();
+    if(!row)fail(410,'This connection expired or has already been approved.');
+    return json({approved:true});
+  }
+  if(path==='/api/app-auth/exchange' && request.method==='POST'){
+    const input=await body(request,true);
+    if(!/^[A-Za-z0-9_-]{43,128}$/.test(input.verifier||''))fail(400,'The sign-in proof is invalid.');
+    const challenge=await hashToken(input.verifier);
+    const pending=await db.prepare('SELECT challenge,user_id FROM app_connections WHERE request_id=? AND expires_at>?').bind(input.requestId||'',Date.now()).first();
+    if(!pending)fail(410,'This app connection expired or was already completed.');
+    if(challenge!==pending.challenge)fail(403,'This connection belongs to a different phone.');
+    if(!pending.user_id)return json({pending:true},202);
+    const token=crypto.getRandomValues(new Uint8Array(32)),plain=btoa(String.fromCharCode(...token)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+    const tokenHash=await hashToken(plain),expiresAt=Date.now()+30*24*60*60*1000;
+    const result=await db.batch([
+      db.prepare('INSERT INTO app_sessions (token_hash,user_id,email,expires_at) SELECT ?,user_id,email,? FROM app_connections WHERE request_id=? AND challenge=? AND expires_at>? AND user_id IS NOT NULL').bind(tokenHash,expiresAt,input.requestId||'',challenge,Date.now()),
+      db.prepare('DELETE FROM app_connections WHERE request_id=? AND challenge=? AND user_id IS NOT NULL').bind(input.requestId||'',challenge)
+    ]);
+    if(result[0].meta.changes!==1)fail(410,'This connection was already completed.');
+    return json({token:plain,expiresAt});
+  }
+  if(path==='/api/app-auth/revoke' && request.method==='POST'){
+    if(!who.id)fail(401,'Sign in to disconnect this app.');await body(request);
+    if(request.headers.has('Authorization'))await db.prepare('DELETE FROM app_sessions WHERE token_hash=?').bind(await hashToken(request.headers.get('Authorization').slice(7))).run();
+    return json({revoked:true});
+  }
+  if(path==='/api/my-data' && request.method==='DELETE'){
+    if(!who.id)fail(401,'Sign in to remove your attendance data.');await body(request);
+    await db.batch([db.prepare('DELETE FROM rsvps WHERE user_id=?').bind(who.id),db.prepare('DELETE FROM app_sessions WHERE user_id=?').bind(who.id),db.prepare('DELETE FROM app_connections WHERE user_id=?').bind(who.id)]);
+    return json({deleted:true});
+  }
   if(request.method==='GET' && path==='/api/session')return json({signedIn:!!who.id,canManage:who.canManage});
   if(request.method==='GET' && (path==='/api/events'||path==='/calendar.ics')){
     const events=await eventsFor(env);
@@ -99,14 +154,17 @@ async function api(request,env,url) {
 export default {
   async fetch(request,env) {
     const url=new URL(request.url);
+    const origin=request.headers.get('Origin');
+    const cors=response=>{if(nativeOrigins.has(origin)){const headers=new Headers(response.headers);headers.set('Access-Control-Allow-Origin',origin);headers.set('Vary','Origin');return new Response(response.body,{status:response.status,headers});}return response;};
     try {
-      if(url.pathname.startsWith('/api/')||url.pathname==='/calendar.ics')return await api(request,env,url);
+      if(request.method==='OPTIONS' && url.pathname.startsWith('/api/')){if(!nativeOrigins.has(origin))return new Response(null,{status:403});return new Response(null,{status:204,headers:{'Access-Control-Allow-Origin':origin,'Access-Control-Allow-Methods':'GET,POST,PUT,DELETE,OPTIONS','Access-Control-Allow-Headers':'Content-Type,Authorization','Access-Control-Max-Age':'600','Vary':'Origin'}});}
+      if(url.pathname.startsWith('/api/')||url.pathname==='/calendar.ics')return cors(await api(request,env,url));
       if(!['GET','HEAD'].includes(request.method))return new Response('Method not allowed',{status:405});
-      const route={'/':'/index.html','/calendar':'/calendar.html','/calendar/':'/calendar.html','/rsvp':'/rsvp.html','/rsvp/':'/rsvp.html'};
+      const route={'/':'/index.html','/calendar':'/calendar.html','/calendar/':'/calendar.html','/rsvp':'/rsvp.html','/rsvp/':'/rsvp.html','/team-app':'/mobile/web-index.html','/team-app/':'/mobile/web-index.html','/connect-app':'/connect-app.html','/privacy':'/privacy.html','/delete-data':'/delete-data.html'};
       const asset=ASSETS[route[url.pathname]||url.pathname];
       if(!asset)return new Response('Page not found',{status:404});
       const bytes=Uint8Array.from(atob(asset.data),c=>c.charCodeAt(0));
-      return new Response(request.method==='HEAD'?null:bytes,{headers:{'Content-Type':asset.type,'Cache-Control':asset.type.includes('text/html')?'no-cache':'public, max-age=3600','X-Content-Type-Options':'nosniff','Referrer-Policy':'strict-origin-when-cross-origin','Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; font-src 'self'; connect-src 'self'; base-uri 'self'; frame-ancestors 'self' https://chatgpt.com; form-action 'self'"}});
-    } catch(error){if(!error.status)console.error('Calendar request failed:',error.message);return json({error:error.status?error.message:'The team calendar is temporarily unavailable. Your changes have not been saved. Please try again.'},error.status||503);}
+      return new Response(request.method==='HEAD'?null:bytes,{headers:{'Content-Type':asset.type,'Cache-Control':asset.type.includes('text/html')||asset.type.includes('javascript')||asset.type.includes('css')?'no-cache':'public, max-age=3600','X-Content-Type-Options':'nosniff','Referrer-Policy':'strict-origin-when-cross-origin','Content-Security-Policy':"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; font-src 'self'; connect-src 'self'; worker-src 'self'; base-uri 'self'; frame-ancestors 'self' https://chatgpt.com; form-action 'self'"}});
+    } catch(error){if(!error.status)console.error('Calendar request failed:',error.message);return cors(json({error:error.status?error.message:'The team calendar is temporarily unavailable. Your changes have not been saved. Please try again.'},error.status||503));}
   }
 };

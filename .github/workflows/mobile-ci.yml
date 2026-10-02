@@ -1,0 +1,43 @@
+name: Mobile app validation
+on:
+  push:
+    branches: [main, sites/aftershock-editorial]
+    paths: ['mobile/**', 'site.config.js', 'assets/**', '.github/workflows/mobile-ci.yml']
+  pull_request:
+    paths: ['mobile/**', 'site.config.js', 'assets/**', '.github/workflows/mobile-ci.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: npm, cache-dependency-path: mobile/package-lock.json}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '21'}
+      - uses: android-actions/setup-android@v3
+      - run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+      - run: npm ci && npm run sync
+        working-directory: mobile
+      - run: chmod +x gradlew && ./gradlew --no-daemon assembleDebug bundleRelease
+        working-directory: mobile/android
+      - uses: actions/upload-artifact@v4
+        with:
+          name: aftershock-android-test-and-release-bundle
+          path: |
+            mobile/android/app/build/outputs/apk/debug/*.apk
+            mobile/android/app/build/outputs/bundle/release/*.aab
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: npm, cache-dependency-path: mobile/package-lock.json}
+      - run: npm ci && npm run sync
+        working-directory: mobile
+      - run: xcodebuild -project ios/App/App.xcodeproj -scheme App -destination 'generic/platform=iOS Simulator' -derivedDataPath build/ios CODE_SIGNING_ALLOWED=NO build
+        working-directory: mobile
+      - uses: actions/upload-artifact@v4
+        with: {name: aftershock-ios-simulator, path: mobile/build/ios/Build/Products/Debug-iphonesimulator/}

@@ -86,7 +86,7 @@
   $('[data-sponsor-grid]').innerHTML=(data.sponsors||[]).map(s=>{const link=external(s.url);return `<${link?'a':'div'} class="sponsor-card" ${link?`href="${esc(link)}" target="_blank" rel="noopener noreferrer"`:''}>${photoUrl(s.logo)?`<img src="${esc(photoUrl(s.logo))}" alt="${esc(s.name)}" loading="lazy" decoding="async">`:esc(s.name)}</${link?'a':'div'}>`;}).join('');
   $$('.sponsor-card img').forEach(img=>img.addEventListener('error',()=>{img.replaceWith(document.createTextNode(img.alt));},{once:true}));
   headline('[data-contact-title]',data.contact.title);text('[data-contact-copy]',data.contact.copy);text('[data-footer-copy]',data.footer.copy);
-  const links=[];const email=data.contact.email?.trim();const phone=data.contact.phone?.replace(/[^+\d]/g,'');
+  const links=[];if(data.contact.name)links.push(`<p class="contact-owner"><strong>${esc(data.contact.name)}</strong><span>${esc(data.contact.role||'Team contact')}</span></p>`);const email=data.contact.email?.trim();const phone=data.contact.phone?.replace(/[^+\d]/g,'');
   if(email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){links.push(`<a class="contact-link" href="mailto:${esc(email)}"><span>EMAIL THE TEAM</span><strong>${esc(email)}</strong></a>`);$('[data-sponsor-contact]').href='mailto:'+email;}
   if(phone)links.push(`<a class="contact-link" href="tel:${esc(phone)}"><span>CALL THE TEAM</span><strong>${esc(data.contact.phone)}</strong></a>`);
   ['instagram','facebook'].forEach(s=>{if(external(data.contact[s]))links.push(`<a class="contact-link" href="${esc(external(data.contact[s]))}" target="_blank" rel="noopener noreferrer"><span>FOLLOW ALONG</span><strong>${s==='instagram'?'Instagram':'Facebook'}</strong></a>`);});

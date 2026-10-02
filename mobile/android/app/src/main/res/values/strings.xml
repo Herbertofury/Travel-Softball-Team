@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Aftershock</string>
+    <string name="title_activity_main">Aftershock</string>
+    <string name="package_name">com.travelsoftball.team</string>
+    <string name="custom_url_scheme">com.travelsoftball.team</string>
+</resources>
