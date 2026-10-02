@@ -1,172 +1,50 @@
-/*
- * TRAVEL SOFTBALL SITE CONTENT
- * ----------------------------
- * This is the main file you edit for normal content changes.
- * Keep team facts, links, colors, roster, schedule, photos, and sponsors here.
- * The layout and behavior live in index.html, styles.css, and app.js.
- */
-
+/* Edit this file to personalize the entire site. All current team details are an illustrative concept. */
 window.SOFTBALL_SITE = {
-  meta: {
-    title: "Team Name | Travel Softball",
-    description: "Official website for Team Name travel softball.",
-  },
-
+  meta: { title: "Aftershock | Travel Softball", description: "All heart. All hustle. All in. Meet Aftershock travel softball." },
+  preview: true,
   brand: {
-    teamName: "TEAM NAME",
-    mark: "TS",
-    subtitle: "TRAVEL SOFTBALL",
-    homeBase: "YOUR CITY, ST",
-    season: "YOUR SEASON",
-    colors: {
-      ink: "#101217",
-      paper: "#f5f0e7",
-      primary: "#ef4b31",
-      accent: "#8ce6d2",
-      warm: "#e8dcc8",
-    },
+    teamName: "AFTERSHOCK", mark: "a/", subtitle: "TRAVEL SOFTBALL", homeBase: "COLORADO", season: "2026 / 27",
+    colors: { ink: "#081c35", paper: "#f6f7f8", primary: "#e5ff4b", accent: "#e5ff4b", warm: "#e8edf1" }
   },
-
   hero: {
-    eyebrow: "TRAVEL SOFTBALL",
-    title: "BUILT FOR THE MILES.<br><em>READY FOR THE MOMENT.</em>",
-    intro: "A high-performance travel softball program built around preparation, confidence, and competing the right way.",
-    image: "assets/images/hero.webp",
-    imageAlt: "Team celebrating together on the softball field",
-    ticker: ["WORK", "TRAVEL", "COMPETE", "GROW"],
+    eyebrow: "FOR THE LOVE OF THE GAME",
+    title: "ALL HEART.<br>ALL HUSTLE.<br><em>ALL IN.</em>",
+    intro: "A team that puts in the work. A dugout that has your back. A game worth giving everything to.",
+    image: "assets/images/hero.webp", imageAlt: "Fastpitch softball in action",
+    ticker: ["LONG DRIVES.", "LATE INNINGS.", "LOUD DUGOUTS."],
+    caption: "THE DIAMOND IS OUR HAPPY PLACE."
   },
-
   story: {
-    title: "MORE THAN A WEEKEND TEAM.",
-    lede: "We develop complete athletes - sharp fundamentals, resilient mindsets, and teammates who know how to show up for each other.",
-    body: "Replace this with the team's real story. Keep it direct and human: what the coaches believe, what players can expect, and what families value about the program.",
-    stats: [
-      { value: "12", label: "ROSTER SPOTS" },
-      { value: "20+", label: "GAME DAYS" },
-      { value: "1", label: "TEAM STANDARD" },
-    ],
+    title: "MORE THAN<br>A JERSEY.",
+    lede: "The extra reps. The early mornings. The teammate who picks you up after a tough inning.",
+    body: "That's what we show up for. We build our game from the fundamentals up, compete with confidence, and leave room for the fun that made us fall in love with softball in the first place.",
+    stats: [{ value: "01", label: "SHOW UP." }, { value: "02", label: "PLAY HARD." }, { value: "03", label: "HAVE THEIR BACK." }]
   },
-
   roster: [
-    {
-      number: "01",
-      name: "PLAYER NAME",
-      positions: ["SS", "2B"],
-      gradYear: "20XX",
-      batsThrows: "R/R",
-      image: "assets/images/players/player-01.webp",
-      profileUrl: "",
-    },
-    {
-      number: "07",
-      name: "PLAYER NAME",
-      positions: ["P", "1B"],
-      gradYear: "20XX",
-      batsThrows: "R/R",
-      image: "assets/images/players/player-07.webp",
-      profileUrl: "",
-    },
-    {
-      number: "10",
-      name: "PLAYER NAME",
-      positions: ["C", "3B"],
-      gradYear: "20XX",
-      batsThrows: "R/R",
-      image: "assets/images/players/player-10.webp",
-      profileUrl: "",
-    },
-    {
-      number: "14",
-      name: "PLAYER NAME",
-      positions: ["CF", "OF"],
-      gradYear: "20XX",
-      batsThrows: "L/R",
-      image: "assets/images/players/player-14.webp",
-      profileUrl: "",
-    },
-    {
-      number: "18",
-      name: "PLAYER NAME",
-      positions: ["P", "OF"],
-      gradYear: "20XX",
-      batsThrows: "R/R",
-      image: "assets/images/players/player-18.webp",
-      profileUrl: "",
-    },
-    {
-      number: "23",
-      name: "PLAYER NAME",
-      positions: ["3B", "UTIL"],
-      gradYear: "20XX",
-      batsThrows: "R/R",
-      image: "assets/images/players/player-23.webp",
-      profileUrl: "",
-    },
+    { number: "02", name: "Avery M.", positions: ["P", "1B"], gradYear: "", batsThrows: "R/R", image: "", profileUrl: "" },
+    { number: "07", name: "Riley J.", positions: ["SS", "2B"], gradYear: "", batsThrows: "R/R", image: "", profileUrl: "" },
+    { number: "11", name: "Jordan K.", positions: ["C", "3B"], gradYear: "", batsThrows: "R/R", image: "", profileUrl: "" },
+    { number: "16", name: "Morgan S.", positions: ["OF"], gradYear: "", batsThrows: "L/R", image: "", profileUrl: "" },
+    { number: "22", name: "Taylor R.", positions: ["P", "OF"], gradYear: "", batsThrows: "R/R", image: "", profileUrl: "" },
+    { number: "28", name: "Casey L.", positions: ["1B", "UTIL"], gradYear: "", batsThrows: "R/R", image: "", profileUrl: "" }
   ],
-
   schedule: [
-    {
-      date: "MAY 09-10",
-      name: "TOURNAMENT NAME",
-      location: "CITY, STATE",
-      type: "Tournament",
-      status: "UPCOMING",
-      mapUrl: "",
-    },
-    {
-      date: "MAY 23-24",
-      name: "TOURNAMENT NAME",
-      location: "CITY, STATE",
-      type: "Tournament",
-      status: "UPCOMING",
-      mapUrl: "",
-    },
-    {
-      date: "JUN 06-07",
-      name: "SHOWCASE NAME",
-      location: "CITY, STATE",
-      type: "Showcase",
-      status: "UPCOMING",
-      mapUrl: "",
-    },
-    {
-      date: "JUN 20-21",
-      name: "TOURNAMENT NAME",
-      location: "CITY, STATE",
-      type: "Tournament",
-      status: "UPCOMING",
-      mapUrl: "",
-    },
+    { id: "fall-classic-2026", date: "OCT 10–11", month: "OCT", day: "10", name: "Fall Classic", location: "Colorado Springs, CO", type: "Tournament", status: "UP NEXT", mapUrl: "", startDate: "2026-10-10", endDate: "2026-10-11", allDay: true, description: "A weekend on the diamond. Field assignments and game times will be posted when confirmed.", rsvpDeadline: "2026-10-08", preview: true },
+    { id: "october-showcase-2026", date: "OCT 24–25", month: "OCT", day: "24", name: "October Showcase", location: "Aurora, CO", type: "Showcase", status: "ON THE CALENDAR", mapUrl: "", startDate: "2026-10-24", endDate: "2026-10-25", allDay: true, description: "Two days of softball. Check back for the confirmed field and game schedule.", rsvpDeadline: "2026-10-22", preview: true },
+    { id: "last-inning-2026", date: "NOV 07–08", month: "NOV", day: "07", name: "Last Inning Invitational", location: "Fort Collins, CO", type: "Tournament", status: "ON THE CALENDAR", mapUrl: "", startDate: "2026-11-07", endDate: "2026-11-08", allDay: true, description: "One more weekend together. Game times and field details to follow.", rsvpDeadline: "2026-11-05", preview: true }
   ],
-
+  calendar: { timezone: "America/Denver", types: ["Tournament", "Showcase", "Practice", "Game", "Team event"] },
   gallery: {
-    copy: "Replace these slots with real game-day, dugout, practice, and travel moments. The layout automatically adapts to however many photos you add.",
+    title: "THIS IS<br>OUR KIND OF WEEKEND.", copy: "A little dirt. A lot of heart. The moments that make the miles worth it.",
     photos: [
-      { src: "assets/images/gallery/game-01.webp", alt: "Game day team moment" },
-      { src: "assets/images/gallery/game-02.webp", alt: "Softball player at bat" },
-      { src: "assets/images/gallery/game-03.webp", alt: "Team in the dugout" },
-      { src: "assets/images/gallery/game-04.webp", alt: "Travel softball action" },
-      { src: "assets/images/gallery/game-05.webp", alt: "Team celebration" },
-    ],
+      { src: "assets/images/game.webp", alt: "Fastpitch softball on the diamond", caption: "BETWEEN THE LINES" },
+      { src: "assets/images/team.webp", alt: "Softball team on the field", caption: "BETTER TOGETHER" },
+      { src: "assets/images/hero.webp", alt: "Softball game action", caption: "EVERY INNING COUNTS" }
+    ]
   },
-
-  sponsors: [
-    { name: "YOUR SPONSOR", logo: "assets/images/sponsors/sponsor-01.svg", url: "" },
-    { name: "YOUR SPONSOR", logo: "assets/images/sponsors/sponsor-02.svg", url: "" },
-    { name: "YOUR SPONSOR", logo: "assets/images/sponsors/sponsor-03.svg", url: "" },
-    { name: "YOUR SPONSOR", logo: "assets/images/sponsors/sponsor-04.svg", url: "" },
-  ],
-
-  contact: {
-    title: "COACHES. FAMILIES. SPONSORS.<br><em>WE'D LOVE TO HEAR FROM YOU.</em>",
-    copy: "Questions about the team, schedule, recruiting, or sponsorships? Reach out directly.",
-    email: "",
-    phone: "",
-    instagram: "",
-    facebook: "",
-  },
-
-  footer: {
-    copy: "Built for the team. Easy to update. Ready to travel.",
-  },
+  sponsors: [],
+  sponsorship: { title: "BIG DREAMS.<br>LOCAL SUPPORT.", copy: "Help with tournament fees, equipment, and the next long drive. Your support keeps our team on the field.", cta: "Let's talk sponsorship" },
+  contact: { name: "Trent", role: "Team owner & contact", title: "LET'S TALK<br><em>SOFTBALL.</em>", copy: "Questions about the team, the schedule, or supporting the next season? Contact Trent.", email: "trent@kerrpanel.com", phone: "720-292-6603", instagram: "", facebook: "", empty: "Team contact details will be announced here." },
+  app: { name: "Aftershock", id: "com.travelsoftball.team", siteUrl: "https://travel-softball-team.becky-herbie-6815.chatgpt.site", version: "1.0.0", build: 1 },
+  footer: { copy: "ALL HEART. ALL HUSTLE. ALL IN." }
 };

@@ -1,346 +1,102 @@
 (() => {
-  "use strict";
-
+  'use strict';
   const data = window.SOFTBALL_SITE;
-  if (!data) {
-    document.body.innerHTML = '<main style="font-family:system-ui;padding:3rem"><h1>Missing site.config.js</h1><p>Make sure site.config.js loads before app.js.</p></main>';
-    return;
+  if (!data) return;
+  const $ = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+  const esc = (s='') => String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const text = (s,v) => $$(s).forEach(el => {el.textContent=v ?? '';});
+  // The authored headline fields allow only line breaks and emphasis, never executable HTML.
+  const headline = (s,v) => $$(s).forEach(el => {el.innerHTML=esc(v).replace(/&lt;br\s*\/?&gt;/gi,'<br>').replace(/&lt;(\/?)em&gt;/gi,'<$1em>');});
+  const url = (v) => {try { const u=new URL(v,location.href); return ['http:','https:'].includes(u.protocol) ? u.href : ''; } catch {return '';}};
+  const photoUrl = (v) => { if(typeof v!=='string' || !v.trim()) return ''; if(!/^[a-z][a-z0-9+.-]*:/i.test(v) && !v.startsWith('//')) return v; return url(v); };
+  const external = (v) => typeof v==='string' && /^https?:\/\//i.test(v) ? url(v) : '';
+  Object.entries(data.brand.colors || {}).forEach(([k,v]) => {if(/^#[\da-f]{3,8}$/i.test(v)) document.documentElement.style.setProperty('--'+k,v);});
+  document.title=data.meta.title;
+  $('meta[name="description"]').content=data.meta.description;
+  $('meta[name="theme-color"]').content=data.brand.colors.ink;
+  text('[data-team-name]',data.brand.teamName);text('[data-team-mark]',data.brand.mark);text('[data-team-subtitle]',data.brand.subtitle);
+  text('[data-home-base]',data.brand.homeBase);text('[data-season]',data.brand.season);text('[data-year]',new Date().getFullYear());
+  text('[data-preview-note]', data.preview ? 'CONCEPT PREVIEW · Illustrative team details and photography.' : '');
+  text('[data-hero-eyebrow]',data.hero.eyebrow);headline('[data-hero-title]',data.hero.title);text('[data-hero-intro]',data.hero.intro);text('[data-hero-caption]',data.hero.caption);
+  if(photoUrl(data.hero.image)) {
+    const img=document.createElement('img');img.alt=data.hero.imageAlt;img.decoding='async';img.fetchPriority='high';img.src=photoUrl(data.hero.image);
+    img.addEventListener('error',()=>img.remove(),{once:true});$('[data-hero-photo]').append(img);
   }
-
-  const $ = (selector, root = document) => root.querySelector(selector);
-  const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
-
-  const escapeHtml = (value = "") => String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-
-  const setTextAll = (selector, value) => {
-    $$(selector).forEach((el) => { el.textContent = value; });
-  };
-
-  const setHtmlAll = (selector, value) => {
-    $$(selector).forEach((el) => { el.innerHTML = value; });
-  };
-
-  const isMeaningfulUrl = (value) => typeof value === "string" && value.trim() !== "";
-
-  function applyBrand() {
-    const root = document.documentElement;
-    const colors = data.brand.colors || {};
-    root.style.setProperty("--ink", colors.ink || "#101217");
-    root.style.setProperty("--paper", colors.paper || "#f5f0e7");
-    root.style.setProperty("--primary", colors.primary || "#ef4b31");
-    root.style.setProperty("--accent", colors.accent || "#8ce6d2");
-    root.style.setProperty("--warm", colors.warm || "#e8dcc8");
-
-    document.title = data.meta?.title || `${data.brand.teamName} | Travel Softball`;
-    const description = $('meta[name="description"]');
-    if (description) description.content = data.meta?.description || "Travel softball team website";
-    const theme = $('meta[name="theme-color"]');
-    if (theme) theme.content = colors.ink || "#101217";
-
-    setTextAll("[data-team-name]", data.brand.teamName);
-    setTextAll("[data-team-mark]", data.brand.mark);
-    setTextAll("[data-team-subtitle]", data.brand.subtitle);
-    setTextAll("[data-home-base]", data.brand.homeBase);
-    setTextAll("[data-season]", data.brand.season);
-    setTextAll("[data-year]", new Date().getFullYear());
-  }
-
-  function renderHero() {
-    setTextAll("[data-hero-eyebrow]", data.hero.eyebrow);
-    setHtmlAll("[data-hero-title]", data.hero.title);
-    setTextAll("[data-hero-intro]", data.hero.intro);
-
-    const photo = $("[data-hero-photo]");
-    if (photo && isMeaningfulUrl(data.hero.image)) {
-      const img = new Image();
-      img.src = data.hero.image;
-      img.alt = data.hero.imageAlt || "Team photo";
-      img.decoding = "async";
-      img.fetchPriority = "high";
-      img.addEventListener("load", () => {
-        photo.innerHTML = "";
-        photo.append(img);
-        photo.classList.add("has-image");
-      });
-    }
-
-    const track = $("[data-ticker-track]");
-    const items = data.hero.ticker || [];
-    if (track && items.length) {
-      const loop = [...items, ...items]
-        .map((item) => `<span>${escapeHtml(item)}</span><i></i>`)
-        .join("");
-      track.innerHTML = loop;
-    }
-  }
-
-  function renderStory() {
-    setTextAll("[data-story-title]", data.story.title);
-    setTextAll("[data-story-lede]", data.story.lede);
-    setTextAll("[data-story-body]", data.story.body);
-
-    const stats = $("[data-stats]");
-    if (!stats) return;
-    stats.innerHTML = (data.story.stats || []).map((stat) => `
-      <div class="stat-card">
-        <strong>${escapeHtml(stat.value)}</strong>
-        <span>${escapeHtml(stat.label)}</span>
-      </div>
-    `).join("");
-  }
-
-  let rosterFilter = "ALL";
-
-  function rosterPositions() {
-    const values = new Set();
-    (data.roster || []).forEach((player) => (player.positions || []).forEach((position) => values.add(position)));
-    return ["ALL", ...values];
-  }
-
-  function renderRosterFilters() {
-    const filters = $("[data-position-filters]");
-    if (!filters) return;
-    filters.innerHTML = rosterPositions().map((position) => `
-      <button class="filter-button ${position === rosterFilter ? "is-active" : ""}" type="button" data-filter="${escapeHtml(position)}">
-        ${escapeHtml(position)}
-      </button>
-    `).join("");
-
-    $$("[data-filter]", filters).forEach((button) => {
-      button.addEventListener("click", () => {
-        rosterFilter = button.dataset.filter;
-        renderRosterFilters();
-        renderRoster();
-      });
-    });
-  }
-
-  function playerPhoto(player) {
-    const alt = `${player.name} - ${player.positions.join(" / ")}`;
-    return `
-      <div class="player-photo" data-photo-shell>
-        <img src="${escapeHtml(player.image)}" alt="${escapeHtml(alt)}" loading="lazy" decoding="async" data-fallback-image>
-        <div class="player-fallback" aria-hidden="true">
-          <span>${escapeHtml(player.number)}</span>
-          <small>ADD PLAYER PHOTO</small>
-        </div>
-      </div>
-    `;
-  }
-
+  $('[data-ticker-track]').innerHTML=(data.hero.ticker||[]).map(x=>'<span>'+esc(x)+'</span>').join('<i></i>');
+  headline('[data-story-title]',data.story.title);text('[data-story-lede]',data.story.lede);text('[data-story-body]',data.story.body);
+  $('[data-stats]').innerHTML=(data.story.stats||[]).map(s=>`<div class="stat-card"><strong>${esc(s.value)}</strong><span>${esc(s.label)}</span></div>`).join('');
+  let filter='ALL';
+  const filters=$('[data-position-filters]');
+  const positions=['ALL',...new Set((data.roster||[]).flatMap(p=>p.positions||[]))];
+  filters.innerHTML=positions.map(p=>`<button type="button" class="filter-button ${p==='ALL'?'is-active':''}" aria-pressed="${p==='ALL'}" data-filter="${esc(p)}">${p==='ALL'?'All players':esc(p)}</button>`).join('');
   function renderRoster() {
-    const grid = $("[data-roster-grid]");
-    const count = $("[data-roster-count]");
-    if (!grid) return;
-
-    const players = (data.roster || []).filter((player) => (
-      rosterFilter === "ALL" || (player.positions || []).includes(rosterFilter)
-    ));
-
-    if (count) count.textContent = `${players.length} PLAYER${players.length === 1 ? "" : "S"}`;
-
-    grid.innerHTML = players.map((player, index) => {
-      const cardTag = isMeaningfulUrl(player.profileUrl) ? "a" : "article";
-      const cardAttrs = isMeaningfulUrl(player.profileUrl)
-        ? `href="${escapeHtml(player.profileUrl)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${escapeHtml(player.name)} profile"`
-        : "";
-      return `
-        <${cardTag} class="player-card reveal is-visible" ${cardAttrs} style="--card-delay:${index * 45}ms">
-          ${playerPhoto(player)}
-          <div class="player-number">#${escapeHtml(player.number)}</div>
-          <div class="player-info">
-            <div>
-              <h3>${escapeHtml(player.name)}</h3>
-              <p>${escapeHtml((player.positions || []).join(" / "))}</p>
-            </div>
-            <dl>
-              <div><dt>GRAD</dt><dd>${escapeHtml(player.gradYear)}</dd></div>
-              <div><dt>B/T</dt><dd>${escapeHtml(player.batsThrows)}</dd></div>
-            </dl>
-          </div>
-        </${cardTag}>
-      `;
-    }).join("");
-
-    $$("[data-fallback-image]", grid).forEach((img) => {
-      const markFailed = () => img.closest("[data-photo-shell]")?.classList.add("show-fallback");
-      img.addEventListener("error", markFailed, { once: true });
-      if (img.complete && img.naturalWidth === 0) markFailed();
-    });
+    const players=(data.roster||[]).filter(p=>filter==='ALL'||(p.positions||[]).includes(filter));
+    text('[data-roster-count]',`${players.length} player${players.length===1?'':'s'}`);
+    $('[data-roster-grid]').innerHTML=players.length ? players.map(p=> {
+      const link=external(p.profileUrl);const tag=link?'a':'article';
+      const photo=photoUrl(p.image) ? `<img class="player-portrait" src="${esc(photoUrl(p.image))}" alt="${esc(p.name)}" loading="lazy" decoding="async">` : '';
+      return `<${tag} class="player-card" ${link?`href="${esc(link)}" target="_blank" rel="noopener noreferrer"`:''}><span class="player-number">${esc(p.number)}</span>${photo}<div class="player-info"><h3>${esc(p.name)}</h3><p>${esc((p.positions||[]).join(' / '))}</p><div class="player-detail">${p.batsThrows?'B/T '+esc(p.batsThrows):''}${p.gradYear?' · Class of '+esc(p.gradYear):''}</div></div></${tag}>`;
+    }).join('') : '<p class="empty-state">Roster announcements are on the way.</p>';
+    $$('.player-portrait').forEach(img=>img.addEventListener('error',()=>img.remove(),{once:true}));
   }
-
-  function renderSchedule() {
-    const list = $("[data-schedule-list]");
-    if (!list) return;
-
-    list.innerHTML = (data.schedule || []).map((event, index) => {
-      const action = isMeaningfulUrl(event.mapUrl)
-        ? `<a href="${escapeHtml(event.mapUrl)}" target="_blank" rel="noopener noreferrer" class="schedule-link">MAP <span aria-hidden="true">↗</span></a>`
-        : `<span class="schedule-status">${escapeHtml(event.status || "UPCOMING")}</span>`;
-      return `
-        <article class="schedule-row reveal" data-delay="${Math.min(index, 3)}">
-          <div class="schedule-index">${String(index + 1).padStart(2, "0")}</div>
-          <div class="schedule-date">${escapeHtml(event.date)}</div>
-          <div class="schedule-name">
-            <h3>${escapeHtml(event.name)}</h3>
-            <p>${escapeHtml(event.type)}</p>
-          </div>
-          <div class="schedule-location">${escapeHtml(event.location)}</div>
-          <div class="schedule-action">${action}</div>
-        </article>
-      `;
-    }).join("");
-  }
-
-  function renderGallery() {
-    const grid = $("[data-gallery-grid]");
-    const copy = $("[data-gallery-copy]");
-    if (copy) copy.textContent = data.gallery?.copy || "";
-    if (!grid) return;
-
-    const photos = data.gallery?.photos || [];
-    grid.innerHTML = photos.map((photo, index) => `
-      <figure class="gallery-card gallery-card-${(index % 5) + 1} reveal" data-delay="${index % 3}">
-        <img src="${escapeHtml(photo.src)}" alt="${escapeHtml(photo.alt)}" loading="lazy" decoding="async" data-gallery-image>
-        <div class="gallery-fallback">
-          <span>${String(index + 1).padStart(2, "0")}</span>
-          <small>ADD TEAM PHOTO</small>
-        </div>
-      </figure>
-    `).join("");
-
-    $$("[data-gallery-image]", grid).forEach((img) => {
-      const markFailed = () => img.parentElement?.classList.add("show-fallback");
-      img.addEventListener("error", markFailed, { once: true });
-      if (img.complete && img.naturalWidth === 0) markFailed();
-    });
-  }
-
-  function renderSponsors() {
-    const grid = $("[data-sponsor-grid]");
-    if (!grid) return;
-
-    grid.innerHTML = (data.sponsors || []).map((sponsor) => {
-      const inner = `
-        <img src="${escapeHtml(sponsor.logo)}" alt="${escapeHtml(sponsor.name)} logo" loading="lazy" decoding="async" data-sponsor-logo>
-        <span class="sponsor-fallback">${escapeHtml(sponsor.name)}</span>
-      `;
-      return isMeaningfulUrl(sponsor.url)
-        ? `<a class="sponsor-card" href="${escapeHtml(sponsor.url)}" target="_blank" rel="noopener noreferrer">${inner}</a>`
-        : `<div class="sponsor-card">${inner}</div>`;
-    }).join("");
-
-    $$("[data-sponsor-logo]", grid).forEach((img) => {
-      const markFailed = () => img.parentElement?.classList.add("show-fallback");
-      img.addEventListener("error", markFailed, { once: true });
-      if (img.complete && img.naturalWidth === 0) markFailed();
-    });
-  }
-
-  function renderContact() {
-    setHtmlAll("[data-contact-title]", data.contact.title);
-    setTextAll("[data-contact-copy]", data.contact.copy);
-    setTextAll("[data-footer-copy]", data.footer?.copy || "");
-
-    const actions = $("[data-contact-actions]");
-    if (!actions) return;
-
-    const links = [];
-    if (data.contact.email) links.push(`<a class="contact-link" href="mailto:${escapeHtml(data.contact.email)}"><span>EMAIL</span><strong>${escapeHtml(data.contact.email)}</strong></a>`);
-    if (data.contact.phone) links.push(`<a class="contact-link" href="tel:${escapeHtml(data.contact.phone.replace(/[^+\\d]/g, ""))}"><span>PHONE</span><strong>${escapeHtml(data.contact.phone)}</strong></a>`);
-    if (data.contact.instagram) links.push(`<a class="contact-link" href="${escapeHtml(data.contact.instagram)}" target="_blank" rel="noopener noreferrer"><span>SOCIAL</span><strong>Instagram ↗</strong></a>`);
-    if (data.contact.facebook) links.push(`<a class="contact-link" href="${escapeHtml(data.contact.facebook)}" target="_blank" rel="noopener noreferrer"><span>SOCIAL</span><strong>Facebook ↗</strong></a>`);
-    actions.innerHTML = links.length
-      ? links.join("")
-      : '<p class="contact-empty">Contact details will be added here.</p>';
-
-    const preferred = data.contact.email ? `mailto:${data.contact.email}` : "#contact";
-    $$("[data-contact-link], [data-sponsor-contact]").forEach((link) => { link.href = preferred; });
-  }
-
-  function renderStructuredData() {
-    const json = {
-      "@context": "https://schema.org",
-      "@type": "SportsTeam",
-      name: data.brand.teamName,
-      sport: "Softball",
-      description: data.meta?.description,
-      email: data.contact?.email || undefined,
-      location: data.brand?.homeBase || undefined,
-    };
-    const script = document.createElement("script");
-    script.type = "application/ld+json";
-    script.textContent = JSON.stringify(json);
-    document.head.append(script);
-  }
-
-  function wireMenu() {
-    const button = $("[data-menu-button]");
-    const menu = $("[data-mobile-menu]");
-    if (!button || !menu) return;
-
-    const close = () => {
-      button.setAttribute("aria-expanded", "false");
-      menu.classList.remove("is-open");
-      document.body.classList.remove("menu-open");
-    };
-
-    button.addEventListener("click", () => {
-      const open = button.getAttribute("aria-expanded") === "true";
-      button.setAttribute("aria-expanded", String(!open));
-      menu.classList.toggle("is-open", !open);
-      document.body.classList.toggle("menu-open", !open);
-    });
-
-    $$("a", menu).forEach((link) => link.addEventListener("click", close));
-    window.addEventListener("resize", () => { if (window.innerWidth > 820) close(); }, { passive: true });
-  }
-
-  function wireHeader() {
-    const header = $("[data-header]");
-    if (!header) return;
-    const update = () => header.classList.toggle("is-scrolled", window.scrollY > 24);
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-  }
-
-  function wireReveal() {
-    const items = $$(".reveal");
-    if (!items.length) return;
-
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) {
-      items.forEach((item) => item.classList.add("is-visible"));
-      return;
-    }
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("is-visible");
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.12 });
-
-    items.forEach((item) => observer.observe(item));
-  }
-
-  applyBrand();
-  renderHero();
-  renderStory();
-  renderRosterFilters();
+  filters.addEventListener('click',e=>{const b=e.target.closest('[data-filter]');if(!b)return;filter=b.dataset.filter;$$('[data-filter]',filters).forEach(x=>{const on=x===b;x.classList.toggle('is-active',on);x.setAttribute('aria-pressed',String(on));});renderRoster();});
   renderRoster();
+  let events=data.schedule||[];
+  const scheduleDate=s=>new Date(s+'T12:00:00Z').toLocaleDateString('en-US',{month:'short',day:'numeric',timeZone:'UTC'}).toUpperCase();
+  function renderSchedule(){
+    const today=new Date().toLocaleDateString('en-CA',{timeZone:'America/Denver'});
+    const upcoming=events.find(e=>!e.cancelled&&e.endDate && e.endDate>=today);
+    const next=$('[data-next-event]').closest('a');next.classList.toggle('is-hidden',!upcoming);
+    if(upcoming){text('[data-next-event]',upcoming.name);text('[data-next-date]',upcoming.date||scheduleDate(upcoming.startDate));next.href='/calendar?event='+encodeURIComponent(upcoming.id);}
+    const list=events.filter(e=>!e.cancelled && e.endDate>=today).slice(0,4);
+    $('[data-schedule-list]').innerHTML=list.length ? list.map(e=>`<article class="schedule-row"><div class="date-tile"><span>${esc(e.month||scheduleDate(e.startDate).split(' ')[0])}</span><strong>${esc(e.day||e.startDate.slice(-2))}</strong></div><div class="schedule-name"><h3>${esc(e.name)}</h3><p>${esc(e.date||(scheduleDate(e.startDate)+(e.endDate!==e.startDate?' – '+scheduleDate(e.endDate):'')))} · ${esc(e.type)}</p></div><p class="schedule-location">${esc(e.location)}</p><div class="schedule-action"><a class="schedule-link" href="/calendar?event=${encodeURIComponent(e.id)}">Details & RSVP ↗</a></div></article>`).join('') : '<p class="empty-state">The next season\'s schedule is coming soon.</p>';
+  }
   renderSchedule();
-  renderGallery();
-  renderSponsors();
-  renderContact();
-  renderStructuredData();
-  wireMenu();
-  wireHeader();
-  requestAnimationFrame(wireReveal);
+  if(location.protocol!=='file:')fetch('/api/events').then(r=>{if(!r.ok)throw new Error();return r.json();}).then(result=>{events=result.events;renderSchedule();}).catch(()=>{const note=$('[data-schedule-load-note]');note.hidden=false;note.textContent='The live schedule could not be loaded. Open the full calendar to try again.';});
+  function icsEscape(v=''){return String(v).replace(/\\/g,'\\\\').replace(/\r?\n/g,'\\n').replace(/,/g,'\\,').replace(/;/g,'\\;');}
+  const validDate=s=>/^\d{4}-\d{2}-\d{2}$/.test(s||'') && !Number.isNaN(Date.parse(s));
+  const dateStamp=s=>s.replace(/-/g,'');
+  const calendarEvents=events.filter(e=>validDate(e.startDate)&&validDate(e.endDate));
+  const calendar=$('[data-calendar]');
+  if(!calendarEvents.length)calendar.hidden=true;
+  calendar.addEventListener('click',()=>{
+    if(location.protocol!=='file:'){location.href='/calendar.ics';return;}
+    const stamp=new Date().toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z/,'Z');
+    const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Travel Softball//Team Schedule//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH',`X-WR-CALNAME:${icsEscape(data.brand.teamName)} schedule`];
+    calendarEvents.forEach((e,i)=>{const end=new Date(e.endDate+'T00:00:00Z');end.setUTCDate(end.getUTCDate()+1);lines.push('BEGIN:VEVENT',`UID:${dateStamp(e.startDate)}-${i}-${data.brand.mark.replace(/[^a-z0-9]/gi,'')}@travel-softball`,`DTSTAMP:${stamp}`,`DTSTART;VALUE=DATE:${dateStamp(e.startDate)}`,`DTEND;VALUE=DATE:${dateStamp(end.toISOString().slice(0,10))}`,`SUMMARY:${icsEscape(e.name)}`,`LOCATION:${icsEscape(e.location)}`,`DESCRIPTION:${icsEscape(data.preview?'Illustrative concept schedule. Replace with confirmed team events.':e.type)}`,'END:VEVENT');});
+    lines.push('END:VCALENDAR');
+    const fold=line=>{let out='',column=0;for(const c of line){const n=new TextEncoder().encode(c).length;if(column+n>73){out+='\r\n ';column=1;}out+=c;column+=n;}return out;};
+    const blob=new Blob([lines.map(fold).join('\r\n')+'\r\n'],{type:'text/calendar;charset=utf-8'});
+    const href=URL.createObjectURL(blob);const a=document.createElement('a');a.href=href;a.download=data.brand.teamName.toLowerCase().replace(/[^a-z0-9]+/g,'-')+'-schedule.ics';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(href),1000);
+  });
+  headline('[data-gallery-title]',data.gallery.title);text('[data-gallery-copy]',data.gallery.copy);
+  const photos=(data.gallery.photos||[]).filter(p=>photoUrl(p.src));
+  $('[data-gallery-grid]').innerHTML=photos.map((p,i)=>`<button class="gallery-card" type="button" data-photo="${i}" aria-label="View photo: ${esc(p.alt)}"><img src="${esc(photoUrl(p.src))}" alt="${esc(p.alt)}" loading="lazy" decoding="async"><span class="gallery-caption">${esc(p.caption||p.alt)}<span aria-hidden="true">＋</span></span></button>`).join('');
+  $$('.gallery-card img').forEach(img=>img.addEventListener('error',()=>{img.remove();},{once:true}));
+  const dialog=$('[data-lightbox]');let photoIndex=0;
+  function showPhoto(index){photoIndex=(index+photos.length)%photos.length;const p=photos[photoIndex];$('[data-lightbox-image]').src=photoUrl(p.src);$('[data-lightbox-image]').alt=p.alt;text('[data-lightbox-caption]',p.caption||p.alt);text('[data-photo-index]',`${photoIndex+1} / ${photos.length}`);}
+  $('[data-gallery-grid]').addEventListener('click',e=>{const b=e.target.closest('[data-photo]');if(!b)return;showPhoto(Number(b.dataset.photo));dialog.showModal();document.body.style.overflow='hidden';});
+  $('.lightbox-close').addEventListener('click',()=>dialog.close());
+  dialog.addEventListener('close',()=>document.body.style.overflow='');
+  dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});
+  dialog.addEventListener('keydown',e=>{if(e.key==='ArrowRight'){e.preventDefault();showPhoto(photoIndex+1);}if(e.key==='ArrowLeft'){e.preventDefault();showPhoto(photoIndex-1);}});
+  $('[data-photo-prev]').addEventListener('click',()=>showPhoto(photoIndex-1));$('[data-photo-next]').addEventListener('click',()=>showPhoto(photoIndex+1));
+  headline('[data-sponsor-title]',data.sponsorship.title);text('[data-sponsor-copy]',data.sponsorship.copy);text('[data-sponsor-contact]',data.sponsorship.cta);
+  $('[data-sponsor-grid]').innerHTML=(data.sponsors||[]).map(s=>{const link=external(s.url);return `<${link?'a':'div'} class="sponsor-card" ${link?`href="${esc(link)}" target="_blank" rel="noopener noreferrer"`:''}>${photoUrl(s.logo)?`<img src="${esc(photoUrl(s.logo))}" alt="${esc(s.name)}" loading="lazy" decoding="async">`:esc(s.name)}</${link?'a':'div'}>`;}).join('');
+  $$('.sponsor-card img').forEach(img=>img.addEventListener('error',()=>{img.replaceWith(document.createTextNode(img.alt));},{once:true}));
+  headline('[data-contact-title]',data.contact.title);text('[data-contact-copy]',data.contact.copy);text('[data-footer-copy]',data.footer.copy);
+  const links=[];if(data.contact.name)links.push(`<p class="contact-owner"><strong>${esc(data.contact.name)}</strong><span>${esc(data.contact.role||'Team contact')}</span></p>`);const email=data.contact.email?.trim();const phone=data.contact.phone?.replace(/[^+\d]/g,'');
+  if(email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){links.push(`<a class="contact-link" href="mailto:${esc(email)}"><span>EMAIL THE TEAM</span><strong>${esc(email)}</strong></a>`);$('[data-sponsor-contact]').href='mailto:'+email;}
+  if(phone)links.push(`<a class="contact-link" href="tel:${esc(phone)}"><span>CALL THE TEAM</span><strong>${esc(data.contact.phone)}</strong></a>`);
+  ['instagram','facebook'].forEach(s=>{if(external(data.contact[s]))links.push(`<a class="contact-link" href="${esc(external(data.contact[s]))}" target="_blank" rel="noopener noreferrer"><span>FOLLOW ALONG</span><strong>${s==='instagram'?'Instagram':'Facebook'}</strong></a>`);});
+  $('[data-contact-actions]').innerHTML=links.length?links.join(''):`<p class="contact-empty">${esc(data.contact.empty)}</p>`;
+  const menu=$('[data-mobile-menu]'),button=$('[data-menu-button]');
+  const closeMenu=()=>{menu.hidden=true;button.setAttribute('aria-expanded','false');$('.sr-only',button).textContent='Open navigation';};
+  button.addEventListener('click',()=>{const open=button.getAttribute('aria-expanded')==='true';menu.hidden=open;button.setAttribute('aria-expanded',String(!open));$('.sr-only',button).textContent=open?'Open navigation':'Close navigation';});
+  $$('a',menu).forEach(a=>a.addEventListener('click',closeMenu));
+  document.addEventListener('keydown',e=>{if(e.key==='Escape' && !menu.hidden){closeMenu();button.focus();}});
+  document.addEventListener('click',e=>{if(!menu.hidden && !$('[data-header]').contains(e.target))closeMenu();});
+  window.matchMedia('(min-width: 821px)').addEventListener('change',e=>{if(e.matches)closeMenu();});
+  if(!data.preview){const schema=document.createElement('script');schema.type='application/ld+json';schema.textContent=JSON.stringify({'@context':'https://schema.org','@type':'SportsTeam',name:data.brand.teamName,sport:'Softball',description:data.meta.description});document.head.append(schema);}
 })();
