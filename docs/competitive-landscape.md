@@ -21,3 +21,21 @@ For each meaningful upstream change, record the source URL, publication/version 
 - [ ] Measure current implementation before a replacement or optimization.
 - [ ] Record correctness, usability, resource cost and recovery results together.
 - [ ] Link only proven improvements to implementation milestones; retain unproven candidates as research.
+
+## Reuse foundations and concrete parts to evaluate
+
+Keep the existing framework-free site and site.config.js as the reusable foundation. TeamSnap is a service/UI reference, not a code base to copy or a subscription to add.
+
+## Integration with our projects
+
+Reuse accessible static-page patterns with the public project-information site only where content and licensing allow. Share layout/test patterns, never private player datasets. Centralize team facts in site.config.js.
+
+## Target improvement and acceptance boundary
+
+Beat generic templates through clear mobile schedules and excellent editability without heavier runtime. Test missing optional data, keyboard flow, reduced motion and slow-network loading.
+
+## License, access and adoption gate
+
+Status: research candidate, not integrated or benchmark-proven. Before copying code, pin the exact upstream revision and record its LICENSE, dependency licenses, notices and distribution obligations. Missing/ambiguous terms block reuse; behavioral study or a permitted interoperable adapter may remain possible. Service documentation is not a source-code license or API grant. Preserve existing user permissions, private/public boundaries and creator/game asset rights.
+
+Choose reuse, adapter, fork or independent implementation only after a target-workload comparison. Retain raw failures and rollback; share no credentials, private fixtures or account details. Adoption remains blocked until licensing, correctness, performance and maintenance cost are reviewed together. Review delta dated 2026-11-12.
