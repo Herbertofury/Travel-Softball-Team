@@ -59,3 +59,7 @@ Once real team details and photos are available:
 4. Add optional public recruiting profile links and event map links.
 5. Choose the final host and domain.
 6. Add analytics only if the team actually wants them.
+
+## Competitive landscape and related approaches
+
+See the [source-led comparison and evaluation plan](docs/competitive-landscape.md). Documented capabilities, research proposals and measured results are kept separate.
